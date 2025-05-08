@@ -1,24 +1,34 @@
+// app/context/AuthContext.tsx
 'use client';
-import { useEffect } from 'react';
+import React, { useEffect, useState, createContext, useContext } from 'react';
 import { auth } from '@/app/lib/firebase';
-import { useRouter } from 'next/navigation';
+import { User } from 'firebase/auth';
 
-export default function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
+type AuthContextType = {
+  user: User | null;
+  displayName: string | null;
+};
+
+const AuthContext = createContext<AuthContextType>({ user: null, displayName: null });
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in
-        console.log('User is logged in:', user);
-      } else {
-        // User is signed out
-        console.log('User is logged out');
-      }
+      setUser(user);
+      setDisplayName(user?.displayName ?? null);
     });
-
     return () => unsubscribe();
-  }, [router]);
+  }, []);
 
-  return <>{children}</>;
+  return (
+    <AuthContext.Provider value={{ user, displayName }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
+
+
+export const useAuth = () => useContext(AuthContext);
