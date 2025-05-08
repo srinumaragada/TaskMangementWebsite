@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Plus, Menu, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 type MenuItem = {
   name: string;
@@ -22,7 +23,7 @@ const Navbar: React.FC = () => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const menuItems: MenuItem[] = [
-    { name: "Home", href: "#home" },
+    { name: "Home", href: "/" },
     {
       name: "Features",
       dropdown: [
@@ -35,14 +36,14 @@ const Navbar: React.FC = () => {
     {
       name: "Templates",
       dropdown: [
-        { name: "Personal Productivity", icon: "📝", href: "#personal-templates" },
+        { name: "Personal Productivity", icon: "📝", href: "/Pages/templates" },
         { name: "Business Projects", icon: "💼", href: "#business-templates" },
         { name: "Education", icon: "🎓", href: "#education-templates" },
         { name: "All Templates", icon: "📂", href: "#all-templates" },
       ],
     },
-    { name: "Contact", href: "#contact" },
-    { name: "About", href: "#about" },
+    { name: "Contact", href: "Pages/contact" },
+    { name: "About", href: "Pages/about" },
   ];
 
   const handleMouseEnter = (menuName: string) => {
@@ -90,14 +91,14 @@ const Navbar: React.FC = () => {
     <nav className="bg-white shadow-sm sticky top-0 z-50" ref={dropdownRef}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between h-16 items-center">
-        
+        <Link href="/">
         <div className="flex items-center">
           <div className="flex-shrink-0 flex items-center gap-4">
             <Image className="rounded-2xl " src="/logo.png" alt='logo' width={50} height={50}/>
             <span className="text-3xl font-bold text-orange-600 ">TaskSphere</span>
           </div>
         </div>
-
+        </Link>
         {/* Desktop Navigation */}
         <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
           {menuItems.map((item) => (
@@ -161,13 +162,13 @@ const Navbar: React.FC = () => {
         
         <div className="hidden md:flex items-center space-x-4">
           <a
-            href="#login"
+            href="/login"
             className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-orange-500 hover:font-semibold"
           >
             Login
           </a>
           <a
-            href="/login"
+            href="/register"
             className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md text-sm font-medium"
           >
             Sign up free
@@ -244,14 +245,14 @@ const Navbar: React.FC = () => {
           ))}
           <div className="border-t border-gray-200 pt-2">
             <a
-              href="#login"
+              href="/login"
               className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-orange-500 hover:font-semibold"
               onClick={() => setMobileMenuOpen(false)}
             >
               Login
             </a>
             <a
-              href="#signup"
+              href="/register"
               className="block px-3 py-2 text-base font-medium text-white bg-orange-600 rounded-md"
               onClick={() => setMobileMenuOpen(false)}
             >
