@@ -1,4 +1,4 @@
-import GoogleButton from '@/components/GoogleButton';
+import GoogleButton from '@/app/components/GoogleButton';
 import Link from 'next/link';
 
 export default function RegisterPage() {
