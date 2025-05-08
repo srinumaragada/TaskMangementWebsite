@@ -10,3 +10,40 @@
     @apply text-2xl font-bold mt-8 mb-4;
   }
 }
+
+/* globals.css */
+@keyframes confetti {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+  }
+}
+
+.animate-confetti {
+  animation: confetti 5s linear forwards;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.group-container {
+  position: relative;
+  padding: 1rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.group-container:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
