@@ -41,7 +41,7 @@ export default function FeaturesPage() {
           {features.map((feature, index) => (
             <Link 
               key={index} 
-              href={`/features/${feature.slug}`}
+              href={`/Pages/features/${feature.slug}`}
               className="bg-gray-50 p-8 rounded-xl hover:shadow-md transition-shadow"
             >
               <div className="mb-4">
