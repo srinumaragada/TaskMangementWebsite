@@ -1,0 +1,214 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { X, Calendar as CalendarIcon, Flag, Tag } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { priorities } from '@/app/utils/page';
+import type { Task } from '@/app/types/tasks';
+import DatePicker from './DatePicker';
+
+interface AddTaskModalProps {
+  initialDate?: Date | null;
+  editingTask?: Task | null;
+  onClose: () => void;
+  onSubmit: (task: Omit<Task, 'id' | 'completed' | 'createdAt'>) => void;
+}
+
+const AddTaskModal: React.FC<AddTaskModalProps> = ({ 
+  initialDate, 
+  editingTask,
+  onClose, 
+  onSubmit 
+}) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showPriorityMenu, setShowPriorityMenu] = useState(false)
+
+  // Initialize form with editing task data
+  useEffect(() => {
+    if (editingTask) {
+      setTitle(editingTask.title);
+      setDescription(editingTask.description || '');
+      setDueDate(editingTask.dueDate ? new Date(editingTask.dueDate) : null);
+      setPriority(editingTask.priority);
+    } else {
+      setTitle('');
+      setDescription('');
+      setDueDate(initialDate || null);
+      setPriority('medium');
+    }
+  }, [editingTask, initialDate]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      title,
+      description,
+      dueDate: dueDate?.toISOString(),
+      priority,
+      labels: editingTask?.labels || []
+    });
+  };
+
+  return (
+    <motion.div
+    initial={{ opacity: 0, y: -10 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -10 }}
+    className="bg-white rounded-xl shadow-xl border h-96 border-gray-200 overflow-hidden mb-6"
+  >
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-3">
+        <h2 className="text-lg font-semibold">
+          {editingTask ? 'Edit Task' : 'Add Task'}
+        </h2>
+        <button 
+          onClick={onClose}
+          className="p-1 rounded-full hover:bg-gray-100"
+        >
+          <X className="h-5 w-5 text-gray-500" />
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-3">
+          <div>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Task title"
+              className="w-full p-2 border-b border-gray-200 focus:border-blue-500 focus:outline-none"
+              autoFocus
+              required
+            />
+          </div>
+
+          <div>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Description (optional)"
+              className="w-full p-2 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 min-h-[80px] text-sm"
+            />
+          </div>
+
+          <div className="flex space-x-2">
+            <div className="relative flex-1">
+              <button
+                type="button"
+                onClick={() => setShowDatePicker(!showDatePicker)}
+                className="w-full flex items-center justify-between p-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm"
+              >
+                <div className="flex items-center">
+                  <CalendarIcon className="h-4 w-4 mr-2 text-gray-500" />
+                  <span>
+                    {dueDate 
+                      ? dueDate.toLocaleDateString('en-US', { 
+                          weekday: 'short', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })
+                      : 'No date'}
+                  </span>
+                </div>
+              </button>
+
+              {showDatePicker && (
+                <div className="absolute z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2">
+                  <DatePicker
+                    selected={dueDate}
+                    onSelect={(date) => {
+                      setDueDate(date);
+                      setShowDatePicker(false);
+                    }}
+                  />
+                  <div className="flex justify-between p-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDueDate(null);
+                        setShowDatePicker(false);
+                      }}
+                      className="text-xs text-gray-500 hover:text-gray-700"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowDatePicker(false)}
+                      className="text-xs text-blue-500 hover:text-blue-700"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowPriorityMenu(!showPriorityMenu)}
+                className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                <Flag className={`h-4 w-4 ${
+                  priority === 'high' ? 'text-red-500' :
+                  priority === 'medium' ? 'text-yellow-500' : 'text-green-500'
+                }`} />
+              </button>
+
+              {showPriorityMenu && (
+                <div className="absolute z-10 right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1">
+                  {priorities.map((p) => (
+                    <button
+                      key={p.value}
+                      type="button"
+                      onClick={() => {
+                        setPriority(p.value as 'low' | 'medium' | 'high');
+                        setShowPriorityMenu(false);
+                      }}
+                      className={`flex items-center w-full px-3 py-1.5 text-left text-sm ${
+                        priority === p.value 
+                          ? 'bg-blue-50 text-blue-600' 
+                          : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <Flag className={`h-3 w-3 mr-2 ${
+                        p.value === 'high' ? 'text-red-500' :
+                        p.value === 'medium' ? 'text-yellow-500' : 'text-green-500'
+                      }`} />
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 flex justify-end space-x-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            {editingTask ? 'Update' : 'Add'}
+          </button>
+        </div>
+      </form>
+    </div>
+  </motion.div>
+  );
+};
+
+export default AddTaskModal;
