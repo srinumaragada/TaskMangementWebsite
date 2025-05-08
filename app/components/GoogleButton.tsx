@@ -13,9 +13,7 @@ export default function GoogleButton() {
     setLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      // User signed in successfully
-      console.log(result.user.displayName);
-      router.push('/dashboard'); // Redirect after successful login
+      router.push('/Pages/dashboard'); 
     } catch (error) {
       console.error("Google sign-in error:", error);
     } finally {
