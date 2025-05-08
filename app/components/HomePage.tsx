@@ -1,5 +1,7 @@
 import { Check, Users, Clock, Calendar, Rocket, ChevronRight, Plus } from 'lucide-react';
 import Link from 'next/link';
+import Navbar from './Navabar';
+import Footer from './Footer';
 
 const HomePage = () => {
   const features = [
@@ -48,8 +50,10 @@ const HomePage = () => {
     }
   ];
 
+ 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar/>
       {/* Hero Section */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
@@ -166,7 +170,7 @@ const HomePage = () => {
                     {template.category}
                   </span>
                   <h3 className="text-xl font-semibold mt-3 mb-2">{template.name}</h3>
-                  <Link href={`/templates/${template.name.toLowerCase().replace(' ', '-')}`} className="text-orange-500 hover:text-orange-600 font-medium flex items-center">
+                  <Link href="#" className="text-orange-500 hover:text-orange-600 font-medium flex items-center">
                     Use template <ChevronRight className="ml-1 h-4 w-4" />
                   </Link>
                 </div>
@@ -175,7 +179,7 @@ const HomePage = () => {
           </div>
           
           <div className="text-center mt-10">
-            <Link href="/templates" className="text-orange-500 hover:text-orange-600 font-medium">
+            <Link href="/Pages/templates" className="text-orange-500 hover:text-orange-600 font-medium">
               View all templates →
             </Link>
           </div>
@@ -195,13 +199,14 @@ const HomePage = () => {
               <Link href="/download" className="bg-white text-orange-600 hover:bg-gray-100 px-6 py-3 rounded-lg font-medium flex items-center justify-center">
                 Download App
               </Link>
-              <Link href="/register" className="bg-transparent border-2 border-white text-white hover:bg-white hover:bg-opacity-10 px-6 py-3 rounded-lg font-medium">
+              <Link href="/register" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-400 hover:bg-opacity-10 px-6 py-3 rounded-lg font-medium">
                 Sign up for free
               </Link>
             </div>
           </div>
         </div>
       </section>
+      <Footer/>
     </div>
   );
 };
