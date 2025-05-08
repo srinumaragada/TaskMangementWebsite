@@ -1,5 +1,6 @@
-import { ChevronRight } from 'lucide-react';
-import Link from 'next/link';
+// pages/templates/index.tsx
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 export default function TemplatesPage() {
   const categories = [
@@ -44,7 +45,7 @@ export default function TemplatesPage() {
               {category.templates.map((template, tIndex) => (
                 <Link 
                   key={tIndex} 
-                  href={`/templates/${template.slug}`}
+                  href={`/Pages/templates/${template.slug}`}
                   className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow"
                 >
                   <h3 className="text-lg font-medium mb-2">{template.name}</h3>
