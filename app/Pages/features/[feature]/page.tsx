@@ -39,7 +39,7 @@ export default function FeaturePage({
   return (
     <div className="py-16 bg-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href="/features" className="text-orange-500 hover:text-orange-600 font-medium flex items-center mb-8">
+        <Link href="/Pages/features" className="text-orange-500 hover:text-orange-600 font-medium flex items-center mb-8">
           <ChevronLeft className="h-5 w-5 mr-1" /> Back to all features
         </Link>
         
