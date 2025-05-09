@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { X, Calendar as CalendarIcon, Flag, Tag } from 'lucide-react';
+import { X, Calendar as CalendarIcon, Flag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { priorities } from '@/app/utils/page';
 import type { Task } from '@/app/types/tasks';
