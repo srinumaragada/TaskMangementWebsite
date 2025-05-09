@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '@/app/components/AuthProvider';
 import { useTasks } from '@/app/context/TaskContext';
 import EmptyState from './empty-state';
@@ -19,7 +19,6 @@ import {
   isTomorrow,
   parseISO,
   addMonths,
-  startOfMonth
 } from 'date-fns';
 
 const UpcomingPage = () => {
