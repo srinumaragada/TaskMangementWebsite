@@ -30,6 +30,7 @@ const statusColors = {
 };
 
 export default function TaskCard({ task, projectId, members = [] }: TaskCardProps) {
+  
   const dispatch = useDispatch<AppDispatch>();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -52,6 +53,7 @@ export default function TaskCard({ task, projectId, members = [] }: TaskCardProp
   
   const isOverdue = task.deadline && isBefore(new Date(task.deadline), new Date()) && task.status !== 'completed';
   const status = isOverdue ? 'overdue' : task.status || 'todo';
+console.log(members);
 
   return (
     <motion.div 
