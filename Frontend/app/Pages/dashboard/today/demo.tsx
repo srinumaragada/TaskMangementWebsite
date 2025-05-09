@@ -2,7 +2,7 @@ import React from 'react'
 import cat from "../../../../public/logo1.jpg"
 import Image from 'next/image'
 type Props = {
-    displayName:String|null
+    displayName:string|null
 }
 const Demo = ({displayName}:Props) => {
   return (
