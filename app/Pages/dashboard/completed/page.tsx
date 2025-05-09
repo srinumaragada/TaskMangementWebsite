@@ -1,22 +1,41 @@
 "use client";
-import { RootState } from '@/app/redux/store/store';
+import { AppDispatch, RootState } from '@/app/redux/store/store';
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { CheckCircle } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { CheckCircle, Trash2 } from 'lucide-react';
+import { deleteCompletedTasks, deleteCompletedTasksFromServer } from '@/app/redux/slice/TaskSlice';
 
 const CompletedTasks = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const { tasks = [] } = useSelector((state: RootState) => state.Tasks);
 
   const completedTasks = Array.isArray(tasks)
     ? tasks.filter(task => task.completed === true)
     : [];
 
+    console.log(completedTasks);
+    
+    const handleDeleteAll = () => {
+      dispatch(deleteCompletedTasksFromServer());
+    };
   return (
     <div className="p-8">
-      <div className="flex items-center mb-6">
-        <CheckCircle className="h-6 w-6 mr-2 text-green-500" />
-        <h1 className="text-xl font-bold">Completed Tasks</h1>
-        <span className="ml-2 text-gray-500">({completedTasks.length})</span>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <CheckCircle className="h-6 w-6 mr-2 text-green-500" />
+          <h1 className="text-xl font-bold">Completed Tasks</h1>
+          <span className="ml-2 text-gray-500">({completedTasks.length})</span>
+        </div>
+
+        {completedTasks.length > 0 && (
+          <button
+            onClick={handleDeleteAll}
+            className="flex items-center gap-2 bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded-md text-sm"
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete All
+          </button>
+        )}
       </div>
 
       {completedTasks.length === 0 ? (
@@ -58,4 +77,5 @@ const CompletedTasks = () => {
     </div>
   );
 };
-export default CompletedTasks
+
+export default CompletedTasks;
