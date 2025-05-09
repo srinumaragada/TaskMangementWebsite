@@ -29,8 +29,9 @@ const UpcomingPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
+  // Set date range to show from today onwards
   const [dateRange, setDateRange] = useState({
-    start: addDays(today, -7),
+    start: today,
     end: addDays(today, 30),
   });
 
@@ -43,11 +44,12 @@ const UpcomingPage = () => {
     addDays(dateRange.start, i)
   );
 
+  // Get overdue tasks (before today and not completed)
   const overdueTasks = tasks
     .filter(task => {
-      if (!task.dueDate) return false;
+      if (!task.dueDate || task.completed) return false;
       const taskDate = startOfDay(parseISO(task.dueDate));
-      return taskDate < today && !task.completed;
+      return taskDate < today;
     })
     .map(task => {
       const taskDate = startOfDay(parseISO(task.dueDate));
@@ -60,7 +62,7 @@ const UpcomingPage = () => {
 
   const getTasksForDate = (date: Date) => {
     return tasks.filter(task => {
-      if (!task.dueDate) return false;
+      if (!task.dueDate || task.completed) return false;
       return isSameDay(parseISO(task.dueDate), date);
     });
   };
@@ -72,15 +74,28 @@ const UpcomingPage = () => {
     return format(date, 'EEEE, MMMM d, yyyy');
   };
 
-  const handleCompleteTask = (taskId: string) => {
-    completeTask(taskId);
+  const handleCompleteTask = async (taskId: string) => {
+    try {
+      await completeTask(taskId);
+    } catch (error) {
+      console.error('Error completing task:', error);
+    }
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    deleteTask(taskId);
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      if (!taskId) {
+        console.error('Cannot delete task - no task ID provided');
+        return;
+      }
+      await deleteTask(taskId);
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
   };
 
   const handleEditTask = (task: Task) => {
+    if (task.completed) return; // Don't allow editing completed tasks
     setEditingTask(task);
     setSelectedDate(task.dueDate ? parseISO(task.dueDate) : null);
     setShowModal(true);
@@ -130,7 +145,7 @@ const UpcomingPage = () => {
     groupedDates[key].push(date);
   });
 
-  const totalTasks = tasks.filter(t => t.dueDate).length + overdueTasks.length;
+  const totalTasks = tasks.filter(t => t.dueDate && !t.completed).length + overdueTasks.length;
 
   return (
     <div className="h-full flex flex-col relative">
@@ -147,13 +162,13 @@ const UpcomingPage = () => {
             <div className="space-y-2">
               {overdueTasks.map(task => (
                 <motion.div
-                  key={task.id}
+                  key={task._id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="flex items-center p-4 bg-red-50 rounded-xl border border-red-100"
                 >
                   <button
-                    onClick={() => handleCompleteTask(task.id)}
+                    onClick={() => handleCompleteTask(task._id)}
                     className={`mr-3 flex-shrink-0 h-5 w-5 rounded-full border ${
                       task.completed
                         ? 'bg-green-500 border-green-500 text-white'
@@ -174,10 +189,17 @@ const UpcomingPage = () => {
                     )}
                   </div>
                   <div className="flex space-x-2">
-                    <button onClick={() => handleEditTask(task)} className="p-1 text-gray-500 hover:text-blue-500">
+                    <button 
+                      onClick={() => handleEditTask(task)} 
+                      className="p-1 text-gray-500 hover:text-blue-500"
+                      disabled={task.completed}
+                    >
                       <Edit className="h-5 w-5" />
                     </button>
-                    <button onClick={() => handleDeleteTask(task.id)} className="p-1 text-gray-500 hover:text-red-500">
+                    <button 
+                      onClick={() => handleDeleteTask(task._id)} 
+                      className="p-1 text-gray-500 hover:text-red-500"
+                    >
                       <Trash2 className="h-5 w-5" />
                     </button>
                   </div>
@@ -220,7 +242,7 @@ const UpcomingPage = () => {
                     <div className="space-y-2 ml-7">
                       {dateTasks.map(task => (
                         <motion.div
-                          key={task.id}
+                          key={task._id}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           className={`flex items-center p-3 rounded-lg border shadow-sm ${
@@ -230,7 +252,7 @@ const UpcomingPage = () => {
                           }`}
                         >
                           <button
-                            onClick={() => handleCompleteTask(task.id)}
+                            onClick={() => handleCompleteTask(task._id)}
                             className={`mr-3 flex-shrink-0 h-5 w-5 rounded-full border ${
                               task.completed
                                 ? 'bg-green-500 border-green-500 text-white'
@@ -251,11 +273,12 @@ const UpcomingPage = () => {
                             <button
                               onClick={() => handleEditTask(task)}
                               className="p-1 text-gray-500 hover:text-blue-500"
+                              disabled={task.completed}
                             >
                               <Edit className="h-5 w-5" />
                             </button>
                             <button
-                              onClick={() => handleDeleteTask(task.id)}
+                              onClick={() => handleDeleteTask(task._id)}
                               className="p-1 text-gray-500 hover:text-red-500"
                             >
                               <Trash2 className="h-5 w-5" />
@@ -296,7 +319,7 @@ const UpcomingPage = () => {
               }}
               onSubmit={newTask => {
                 if (editingTask) {
-                  updateTask(editingTask.id, newTask);
+                  updateTask(editingTask._id, newTask);
                 } else {
                   addTask(newTask);
                 }
