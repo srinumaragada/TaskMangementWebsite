@@ -21,6 +21,7 @@ const io = new Server(server, {
   cors: {
     origin: ["http://localhost:3000","https://task-mangement-website.vercel.app/"],
     methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cache-Control", "Expires", "Pragma"],
     credentials: true
   },
   path: "/socket.io"
