@@ -1,17 +1,15 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
+import { GeistSans, GeistMono } from "geist/font";
 import "./globals.css";
 import ClientLayout from "./clientLayout";
+import NotificationListener from "./components/NotificationListener";
+import { ReactNode } from "react";
 
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const inter = Inter({ subsets: ['latin'] });
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+// Initialize fonts
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap'
 });
 
 export const metadata = {
@@ -19,20 +17,18 @@ export const metadata = {
   description: 'Organize your work and life, finally.',
 };
 
+interface RootLayoutProps {
+  children: ReactNode;
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.className} antialiased`}
-      >
-   <ClientLayout>
-    {children}
-   </ClientLayout>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${inter.variable}`}>
+      <body className="antialiased">
+        <ClientLayout>
+          <NotificationListener />
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );
