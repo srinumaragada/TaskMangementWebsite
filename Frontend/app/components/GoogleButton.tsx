@@ -12,7 +12,7 @@ export default function GoogleButton() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
+       await signInWithPopup(auth, googleProvider);
       router.push('/Pages/dashboard'); 
     } catch (error) {
       console.error("Google sign-in error:", error);
