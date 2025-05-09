@@ -10,7 +10,7 @@ interface EmptyStateProps {
   grouping?: string;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ displayName, filter = 'all', grouping = 'none' }) => {
+const EmptyState: React.FC<EmptyStateProps> = ({  filter = 'all', grouping = 'none' }) => {
   return (
     <div className="flex-1 p-8 flex flex-col items-center justify-center">
       <div className="text-center max-w-md">
