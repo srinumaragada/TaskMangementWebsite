@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Project } from '@/app/types/project';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/app/redux/store/store';
-import { deleteProject, fetchProjects, updateProject } from '@/app/redux/slice/projects/projectsSlice';
+import { deleteProject, updateProject } from '@/app/redux/slice/projects/projectsSlice';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { TextArea } from '../ui/TextArea';
