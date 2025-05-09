@@ -1,31 +1,48 @@
 const Task = require("../../model/AddTask");
+const notificationService = require("../../services/notificationService");
 const createTask = async (req, res) => {
-    try {
-      
-      const { title, description, dueDate, priority, labels } = req.body;
-      const userId = req.user.id;
-  
-      const task = await Task.create({
-        title,
-        description,
-        dueDate,
-        priority,
-        labels,
-        userId
-      });
-  
-      res.status(201).json({
-        success: true,
-        task
-      });
-    } catch (error) {
+  try {
+    const { title, description, dueDate, priority, labels } = req.body;
+    const userId = req.user.id;  // Assuming userId is from the authenticated user
     
-      res.status(400).json({
-        success: false,
-        message: error.message
-      });
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
     }
+
+    // Create the task with the userId
+    const task = await Task.create({
+      title,
+      description,
+      dueDate,
+      priority,
+      labels,
+      userId // Add the creator as the userId (or assignee)
+    });
+
+    // Notify relevant users. If you don’t have an assignee, notify the creator or a set of users.
+    const usersToNotify = [userId];  // Notify the task creator as an example
+
+    // Send notification to users
+    await notificationService.createAndBroadcastToUsers(
+      usersToNotify,
+      'TASK_CREATED',
+      { taskId: task._id, taskTitle: task.title },
+      userId
+    );
+
+    res.status(201).json({
+      success: true,
+      task
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
   }
+};
+
+
 
 
  const getTasks = async (req, res) => {
@@ -86,18 +103,17 @@ const createTask = async (req, res) => {
   }
 };
 
-
- const updateTask = async (req, res) => {
+const updateTask = async (req, res) => {
   try {
     const { title, description, dueDate, priority, labels, completed } = req.body;
-    
+    const userId = req.user.id;
+
     const task = await Task.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
+      { _id: req.params.id, userId: userId },
       { title, description, dueDate, priority, labels, completed },
       { new: true, runValidators: true }
     );
-    
-    
+
     if (!task) {
       return res.status(404).json({
         success: false,
@@ -105,10 +121,17 @@ const createTask = async (req, res) => {
       });
     }
 
+    // Send notification to the task creator (user)
+    await notificationService.createAndBroadcastToUsers(
+      [userId],
+      'TASK_UPDATED',
+      { taskId: task._id, taskTitle: task.title },
+      userId
+    );
+
     res.status(200).json({
       success: true,
       task
-      
     });
   } catch (error) {
     res.status(400).json({
@@ -119,7 +142,8 @@ const createTask = async (req, res) => {
 };
 
 
- const deleteTask = async (req, res) => {
+
+const deleteTask = async (req, res) => {
   try {
     const task = await Task.findOneAndDelete({
       _id: req.params.id,
@@ -132,6 +156,17 @@ const createTask = async (req, res) => {
         message: 'Task not found'
       });
     }
+
+    // Send notification to the task owner
+    await notificationService.createAndBroadcastToUsers(
+      [req.user.id],
+      'TASK_DELETED',
+      {
+        taskId: task._id,
+        taskTitle: task.title
+      },
+      req.user.id
+    );
 
     res.status(200).json({
       success: true,
