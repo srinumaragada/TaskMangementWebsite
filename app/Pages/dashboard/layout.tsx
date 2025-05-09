@@ -24,8 +24,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const { user: authUser, displayName } = useAuth();
   const reduxAuthState = useSelector((state: RootState) => state.Auth);
-  console.log(reduxAuthState);
-  
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -34,15 +32,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
 
-
-
-
   useEffect(() => {
     const handleResize = () => {
       setSidebarOpen(window.innerWidth >= 768);
     };
-
-    handleResize(); 
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -67,35 +61,34 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     try {
       await signOut(auth);
       await dispatch(logoutUser() as unknown as AnyAction);
-      router.push('/login');
+      router.push("/login");
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
   const getUserInitial = () => {
     if (displayName) return displayName.charAt(0).toUpperCase();
-    if (user && 'userName' in user) return user.userName.charAt(0).toUpperCase();
+    if (user && "userName" in user) return user.userName.charAt(0).toUpperCase();
     return "?";
   };
 
   const getDisplayName = () => {
     if (displayName) return displayName;
-    if (user && 'userName' in user) return user.userName;
+    if (user && "userName" in user) return user.userName;
     return "User";
   };
 
   const getUserEmail = () => {
-    if (user && 'email' in user) return user.email;
-    if (authUser?.email) return authUser.email;    
+    if (user && "email" in user) return user.email;
+    if (authUser?.email) return authUser.email;
     return "";
   };
-
- 
 
   return (
     <TaskProvider>
       <div className="flex min-h-screen font-sans text-gray-900 bg-white">
+        {/* Sidebar */}
         <aside
           ref={sidebarRef}
           className={`fixed md:static top-0 z-30 bg-[#faf9f5] border-r border-gray-200 w-64 transform transition-transform duration-200 ease-in-out ${
@@ -179,14 +172,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </aside>
 
+        {/* Mobile Sidebar Toggle */}
         <button
-          className="absolute top-4 right-4 md:hidden z-40 mx-auto text-gray-700"
+          className="absolute top-4 left-4 md:hidden z-40 text-gray-700"
           onClick={() => setSidebarOpen((prev) => !prev)}
         >
           <Menu className="h-6 w-6" />
         </button>
 
-        <main className="flex-1">{children}</main>
+
+        {/* Main Content */}
+        <main className="flex-1 mt-16 md:mt-0">{children}</main>
       </div>
     </TaskProvider>
   );
