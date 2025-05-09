@@ -1,0 +1,33 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "app/package.json",
+        "use": "@vercel/next"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "app/api/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "app/$1"
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/(.*)",
+        "destination": "/app/$1"
+      }
+    ],
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "build": {
+      "env": {
+        "NEXT_PUBLIC_VERCEL_ENV": "production"
+      }
+    }
+  }
