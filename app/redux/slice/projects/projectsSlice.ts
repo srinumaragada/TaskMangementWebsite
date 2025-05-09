@@ -11,7 +11,7 @@ interface Project {
 }
 
 interface ProjectsState {
-  status:"loading"|"failed"|"succeeded"
+  status: "loading" | "failed" | "succeeded";
   projects: Project[];
   currentProject: Project | null;
   loading: boolean;
@@ -23,10 +23,11 @@ const initialState: ProjectsState = {
   currentProject: null,
   loading: false,
   error: null,
-  status:"loading"
+  status: "loading"
 };
 
-const API_BASE = 'http://localhost:4000/api/projects';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
 
 type KnownError = {
   message: string;
@@ -41,7 +42,7 @@ export const fetchProjects = createAsyncThunk<
   'projects/fetchProjects',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(API_BASE, {
+      const res = await axios.get(`${API_BASE}/projects`, {
         withCredentials: true
       });
       return res.data.projects;
@@ -66,7 +67,7 @@ export const createProject = createAsyncThunk<
   'projects/createProject',
   async (projectData, { rejectWithValue }) => {
     try {
-      const res = await axios.post(API_BASE, projectData, {
+      const res = await axios.post(`${API_BASE}/projects`, projectData, {
         withCredentials: true
       });
       return res.data;
@@ -83,7 +84,6 @@ export const createProject = createAsyncThunk<
   }
 );
 
-
 export const updateProject = createAsyncThunk<
   Project,
   { id: string; projectData: { title: string; description: string } },
@@ -92,7 +92,7 @@ export const updateProject = createAsyncThunk<
   'projects/updateProject',
   async ({ id, projectData }, { rejectWithValue }) => {
     try {
-      const res = await axios.put(`${API_BASE}/${id}`, projectData, {
+      const res = await axios.put(`${API_BASE}/projects/${id}`, projectData, {
         withCredentials: true
       });
       return res.data;
@@ -117,7 +117,7 @@ export const deleteProject = createAsyncThunk<
   'projects/deleteProject',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_BASE}/${id}`, {
+      await axios.delete(`${API_BASE}/projects/${id}`, {
         withCredentials: true
       });
       return id;
@@ -134,7 +134,6 @@ export const deleteProject = createAsyncThunk<
   }
 );
 
-
 export const addProjectMember = createAsyncThunk<
   Project,
   { projectId: string; email: string },
@@ -144,7 +143,7 @@ export const addProjectMember = createAsyncThunk<
   async ({ projectId, email }, { rejectWithValue }) => {
     try {
       const res = await axios.post(
-        `${API_BASE}/${projectId}/members`,
+        `${API_BASE}/projects/${projectId}/members`,
         { email },
         { withCredentials: true }
       );
@@ -171,7 +170,7 @@ export const removeProjectMember = createAsyncThunk<
   async ({ projectId, memberId }, { rejectWithValue }) => {
     try {
       const res = await axios.delete(
-        `${API_BASE}/${projectId}/members/${memberId}`,
+        `${API_BASE}/projects/${projectId}/members/${memberId}`,
         { withCredentials: true }
       );
       return { projectId, memberId, project: res.data.project };
@@ -209,14 +208,13 @@ const projectSlice = createSlice({
       })
       .addCase(fetchProjects.fulfilled, (state, action) => {
         state.loading = false;
-        state.projects = action.payload
-        
+        state.projects = action.payload;
       })
       .addCase(fetchProjects.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch projects';
       })
-      
+
       // Create Project
       .addCase(createProject.pending, (state) => {
         state.loading = true;
@@ -224,12 +222,10 @@ const projectSlice = createSlice({
       })
       .addCase(createProject.fulfilled, (state, action) => {
         state.loading = false;
-      
-        // Make sure this is safe
+
         if (Array.isArray(state.projects)) {
           state.projects.push(action.payload);
         } else {
-          // fallback: reset to array
           state.projects = [action.payload];
         }
       })
@@ -237,13 +233,12 @@ const projectSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message || 'Failed to create project';
       })
-      
+
       .addCase(updateProject.fulfilled, (state, action) => {
         const updatedProject = action.payload;
         const index = state.projects.findIndex(p => p._id === updatedProject._id);
-      
+
         if (index !== -1) {
-          // Replace the item using immutable logic
           state.projects = [
             ...state.projects.slice(0, index),
             updatedProject,
@@ -251,46 +246,48 @@ const projectSlice = createSlice({
           ];
         }
       })
+
       // Delete Project
       .addCase(deleteProject.fulfilled, (state, action) => {
         state.projects = state.projects.filter(p => p._id !== action.payload);
         if (state.currentProject?._id === action.payload) {
           state.currentProject = null;
         }
-      }) .addCase(addProjectMember.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(addProjectMember.fulfilled, (state, action) => {
-      const projectIndex = state.projects.findIndex(
-        p => p._id === action.payload._id
-      );
-      if (projectIndex !== -1) {
-        state.projects[projectIndex] = action.payload;
-      }
-      state.status = 'succeeded';
-    })
-    .addCase(addProjectMember.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.payload?.message || 'Failed to add member';
-    })
-    .addCase(removeProjectMember.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(removeProjectMember.fulfilled, (state, action) => {
-      const projectIndex = state.projects.findIndex(
-        p => p._id === action.payload.projectId
-      );
-      if (projectIndex !== -1) {
-        state.projects[projectIndex].members = state.projects[projectIndex].members.filter(
-          m => m._id !== action.payload.memberId
+      })
+      .addCase(addProjectMember.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(addProjectMember.fulfilled, (state, action) => {
+        const projectIndex = state.projects.findIndex(
+          p => p._id === action.payload._id
         );
-      }
-      state.status = 'succeeded';
-    })
-    .addCase(removeProjectMember.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.payload?.message || 'Failed to remove member';
-    });
+        if (projectIndex !== -1) {
+          state.projects[projectIndex] = action.payload;
+        }
+        state.status = 'succeeded';
+      })
+      .addCase(addProjectMember.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload?.message || 'Failed to add member';
+      })
+      .addCase(removeProjectMember.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(removeProjectMember.fulfilled, (state, action) => {
+        const projectIndex = state.projects.findIndex(
+          p => p._id === action.payload.projectId
+        );
+        if (projectIndex !== -1) {
+          state.projects[projectIndex].members = state.projects[projectIndex].members.filter(
+            m => m._id !== action.payload.memberId
+          );
+        }
+        state.status = 'succeeded';
+      })
+      .addCase(removeProjectMember.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload?.message || 'Failed to remove member';
+      });
   }
 });
 
