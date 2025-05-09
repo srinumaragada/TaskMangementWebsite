@@ -2,7 +2,7 @@
 
 import React from 'react';
 import TaskItem from './TaskItem';
-import type { Task, GroupingType, PriorityType } from '@/app/types/tasks';
+import type { Task, GroupingType } from '@/app/types/tasks';
 import { labels } from '@/app/utils/page';
 
 interface BoardViewProps {
