@@ -63,14 +63,14 @@ const loginUser = async (req, res) => {
           email: checkUser.email,
           userName: checkUser.userName,
         },
-        "CLIENT_SECRET_KEY",
-        { expiresIn: "60m" }
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || "60m"  }
       );
   
       res.cookie("token", token, { 
         httpOnly: true, 
-        // secure: false,
-        sameSite: "Lax", 
+         secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax"||"none", 
         maxAge: 24 * 60 * 60 * 1000,
       }).json({
         success: true,
@@ -110,7 +110,7 @@ const logoutUser = (req, res) => {
       });
   
     try {
-      const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
+      const decoded = jwt.verify(token,process.env.JWT_SECRET);
       req.user = decoded;
       next();
     } catch (error) {
