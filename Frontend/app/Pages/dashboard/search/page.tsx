@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { useTasks } from '@/app/context/TaskContext';
-import { Task, PriorityType, ViewType, SortingType, DirectionType, FilterType } from '@/app/types/tasks';
+import { Task, PriorityType, SortingType, DirectionType, FilterType } from '@/app/types/tasks';
 
 // Replace with your actual TaskCard component or create a simple one
 const TaskCard = ({ task }: { task: Task }) => {
