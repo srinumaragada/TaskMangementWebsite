@@ -3,7 +3,7 @@ import { AppDispatch, RootState } from '@/app/redux/store/store';
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { CheckCircle, Trash2 } from 'lucide-react';
-import { deleteCompletedTasks, deleteCompletedTasksFromServer } from '@/app/redux/slice/TaskSlice';
+import {  deleteCompletedTasksFromServer } from '@/app/redux/slice/TaskSlice';
 
 const CompletedTasks = () => {
   const dispatch = useDispatch<AppDispatch>();
