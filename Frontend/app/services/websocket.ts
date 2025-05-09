@@ -15,7 +15,7 @@ class WebSocketService {
   async connect(callback: (message: NotificationMessage) => void): Promise<void> {
     return new Promise((resolve, reject) => {
       const socketUrl = process.env.NODE_ENV === "production"
-        ? window.location.origin
+        ? "https://taskmangementwebsite.onrender.com"
         : "http://localhost:4000";
 
       this.socket = io(socketUrl, {
