@@ -1,6 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+// Define API base URL based on environment
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'; // Default to localhost in dev
+
 export interface User {
   id: string;
   userName: string;
@@ -21,52 +24,40 @@ const initialState: AuthState = {
 };
 
 // Register User
-export const registerUser = createAsyncThunk<
-  any, 
-  { userName: string; email: string; password: string } 
->('auth/register', async (formData, thunkAPI) => {
-  try {
-    const response = await axios.post(
-      'http://localhost:4000/api/auth/register',
-      formData,
-      { withCredentials: true }
-    );
-    return response.data;
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.response?.data || 'Registration failed');
+export const registerUser = createAsyncThunk<any, { userName: string; email: string; password: string }>(
+  'auth/register',
+  async (formData, thunkAPI) => {
+    try {
+      const response = await axios.post(`${API_BASE}/auth/register`, formData, { withCredentials: true });
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || 'Registration failed');
+    }
   }
-});
+);
 
 // Login User
-export const loginUser = createAsyncThunk<
-  any,
-  { email: string; password: string }
->('auth/login', async (formData, thunkAPI) => {
-  try {
-    const response = await axios.post(
-      'http://localhost:4000/api/auth/login',
-      formData,
-      { withCredentials: true }
-    );
-    return response.data;
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.response?.data || 'Login failed');
+export const loginUser = createAsyncThunk<any, { email: string; password: string }>(
+  'auth/login',
+  async (formData, thunkAPI) => {
+    try {
+      const response = await axios.post(`${API_BASE}/auth/login`, formData, { withCredentials: true });
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || 'Login failed');
+    }
   }
-});
+);
 
 // Logout User
 export const logoutUser = createAsyncThunk('auth/logout', async () => {
-  const response = await axios.post(
-    'http://localhost:4000/api/auth/logout',
-    {},
-    { withCredentials: true }
-  );
+  const response = await axios.post(`${API_BASE}/auth/logout`, {}, { withCredentials: true });
   return response.data;
 });
 
 // Check Auth
 export const checkAuth = createAsyncThunk('auth/checkauth', async () => {
-  const response = await axios.get('http://localhost:4000/api/auth/check-auth', {
+  const response = await axios.get(`${API_BASE}/auth/check-auth`, {
     withCredentials: true,
     headers: {
       'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -119,7 +110,7 @@ const authSlice = createSlice({
           state.isAuthenticated = true;
         }
       })
-      
+
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;
         state.user = null;
