@@ -8,8 +8,8 @@ interface Task {
   description?: string;
   status: 'todo' | 'in-progress' | 'completed' | 'not-started';
   project: string;
-  assignedTo: any; // Consider using a more specific type
-  createdBy: any;  // Consider using a more specific type
+  assignedTo: any; 
+  createdBy: any;  
   deadline: string;
   createdAt?: string;
   updatedAt?: string;
@@ -44,7 +44,7 @@ const initialState: TasksState = {
 };
 
 // Base API URL
-const API_BASE = 'http://localhost:4000/api/projects';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
 
 // Helper type for rejectValue
 interface KnownError {
@@ -61,7 +61,7 @@ export const getTasks = createAsyncThunk<
   async ({ projectId }, { rejectWithValue }) => {
     try {
       const response = await axios.get<TasksApiResponse>(
-        `${API_BASE}/${projectId}/tasks`,
+        `${API_BASE}/projects/${projectId}/tasks`,
         { withCredentials: true }
       );
       return response.data.tasks || [];
@@ -88,7 +88,7 @@ export const createTask = createAsyncThunk<
   async ({ projectId, taskData }, { rejectWithValue }) => {
     try {
       const response = await axios.post<TasksApiResponse>(
-        `${API_BASE}/${projectId}/tasks`,
+        `${API_BASE}/projects/${projectId}/tasks`,
         taskData,
         { withCredentials: true }
       );
@@ -119,7 +119,7 @@ export const updateTask = createAsyncThunk<
   async ({ projectId, taskId, taskData }, { rejectWithValue }) => {
     try {
       const response = await axios.put<TasksApiResponse>(
-        `${API_BASE}/${projectId}/tasks/${taskId}`,
+        `${API_BASE}/projects/${projectId}/tasks/${taskId}`,
         taskData,
         { withCredentials: true }
       );
@@ -150,7 +150,7 @@ export const deleteTask = createAsyncThunk<
   async ({ projectId, taskId }, { rejectWithValue }) => {
     try {
       await axios.delete(
-        `${API_BASE}/${projectId}/tasks/${taskId}`,
+        `${API_BASE}/projects/${projectId}/tasks/${taskId}`,
         { withCredentials: true }
       );
       return taskId;
@@ -177,7 +177,7 @@ export const updateTaskStatus = createAsyncThunk<
   async ({ projectId, taskId, status }, { rejectWithValue }) => {
     try {
       const response = await axios.put<TasksApiResponse>(
-        `${API_BASE}/${projectId}/tasks/${taskId}/status`,
+        `${API_BASE}/projects/${projectId}/tasks/${taskId}/status`,
         { status },
         { withCredentials: true }
       );
