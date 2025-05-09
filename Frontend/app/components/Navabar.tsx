@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Plus, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
+import logo from "../../public/logo.png"
 type MenuItem = {
   name: string;
   href?: string;
@@ -94,7 +94,7 @@ const Navbar: React.FC = () => {
         <Link href="/">
         <div className="flex items-center">
           <div className="flex-shrink-0 flex items-center gap-4">
-            <Image className="rounded-2xl " src="/logo.png" alt='logo' width={50} height={50}/>
+            <Image className="rounded-2xl " src={logo} alt='logo' width={50} height={50}/>
             <span className="text-3xl font-bold text-orange-600 ">TaskSphere</span>
           </div>
         </div>

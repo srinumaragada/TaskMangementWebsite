@@ -152,9 +152,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               />
             </nav>
 
-            <div className="mt-8 px-4 text-xs text-gray-500 font-semibold select-text">
-              My Projects
-            </div>
+            <div className="mt-8 px-4 flex items-center justify-between">
+  <span className="text-md text-gray-500 font-semibold select-text">
+    My Projects
+  </span>
+  <button 
+    onClick={() => router.push("/Pages/dashboard/AddTeam")}
+    className="text-gray-500 hover:text-gray-700 p-1"
+    aria-label="Add new project"
+  >
+    <Plus className="h-4 w-4" />
+  </button>
+</div>
             <button className="flex items-center gap-2 px-4 py-1 mt-2 text-gray-700 hover:bg-gray-100 rounded">
               <span className="text-gray-400">#</span>
               <span className="truncate">Getting Started Guide</span>
@@ -162,7 +171,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </button>
 
             <div className="mt-auto px-4 py-4 text-md text-gray-600 space-y-2">
-              <button className="flex items-center gap-2 hover:text-gray-700">
+              <button  onClick={()=>router.push("/Pages/dashboard/AddTeam")}className="flex items-center gap-2 hover:text-gray-700">
                 <Plus className="h-3 w-3" /> Add a team
               </button>
               <button className="flex items-center gap-2 hover:text-gray-700">

@@ -40,12 +40,6 @@ export const dashboardSidebarList = [
     
   },
   {
-    icon: <Filter className="h-4 w-4" />,
-    label: "Filters & Labels",
-    tab: "filters",
-    path:"/Pages/dashboard/filters"
-  },
-  {
     icon: <CheckCircle className="h-4 w-4" />,
     label: "Completed",
     tab: "completed",

@@ -1,4 +1,6 @@
 import React from 'react'
+import cat from "../../../../public/logo1.jpg"
+import Image from 'next/image'
 type Props = {
     displayName:String|null
 }
@@ -7,11 +9,11 @@ const Demo = ({displayName}:Props) => {
     <div className="flex-1 p-8">
         <h1 className="font-bold text-lg mb-8 select-text">Today</h1>
         <div className="flex flex-col items-center justify-center space-y-4">
-          <img
+          <Image
             alt="Cat illustration"
             className="w-36 h-36"
             draggable={false}
-            src="/logo1.jpg"
+            src={cat}
             width={150}
             height={150}
           />
