@@ -115,7 +115,6 @@ export const completeTask = createAsyncThunk<
     try {
       let response;
       if (taskData.completed === true && Object.keys(taskData).length === 1) {
-        // Special case: only updating completed flag -> call /complete endpoint
         response = await axios.put(`${API_BASE}/tasks/complete/${taskId}`, taskData, {
           withCredentials: true
         });
@@ -132,6 +131,22 @@ export const completeTask = createAsyncThunk<
     }
   }
 );
+export const deleteCompletedTasksFromServer = createAsyncThunk<
+  void,
+  void,
+  { rejectValue: { message: string } }
+>('tasks/deleteCompleteTask', async (_, { rejectWithValue }) => {
+  try {
+    await axios.delete(`${API_BASE}/tasks/deleteCompleteTask`, {
+      withCredentials: true
+    });
+    return;
+  } catch (err) {
+    const error = err as AxiosError<{ message: string }>;
+    return rejectWithValue(error.response?.data ?? { message: 'Failed to delete completed tasks' });
+  }
+});
+
 
 // Slice
 const taskSlice = createSlice({
@@ -140,7 +155,10 @@ const taskSlice = createSlice({
   reducers: {
     clearCurrentTask: (state) => {
       state.currentTask = null;
-    }
+    },
+    deleteCompletedTasks: (state) => {
+      state.tasks = state.tasks.filter(task => !task.completed);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -234,9 +252,12 @@ const taskSlice = createSlice({
         if (index !== -1) {
           state.tasks[index] = action.payload;
         }
-      });
+      }).addCase(deleteCompletedTasksFromServer.fulfilled, (state) => {
+        state.tasks = state.tasks.filter(task => !task.completed);
+      })
+      
   }
 });
 
-export const { clearCurrentTask } = taskSlice.actions;
+export const { clearCurrentTask,deleteCompletedTasks } = taskSlice.actions;
 export default taskSlice.reducer;
