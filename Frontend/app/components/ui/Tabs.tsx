@@ -8,7 +8,6 @@ interface TabsProps {
 }
 
 function TabsRoot({ defaultValue, children, className = '' }: TabsProps) {
-  const [activeTab, setActiveTab] = useState(defaultValue);
   return (
     <div className={`${className}`}>
       {children}
@@ -34,7 +33,7 @@ interface TabsTriggerProps {
   children: ReactNode;
 }
 
-function TabsTrigger({ value, children }: TabsTriggerProps) {
+function TabsTrigger({  children }: TabsTriggerProps) {
   return (
     <button
       className="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
