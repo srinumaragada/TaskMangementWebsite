@@ -84,7 +84,7 @@ export default function TeamManagement({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Team Members</h3>
+        <h3 className="text-lg font-medium">Project Members</h3>
         <Button
           onClick={() => setIsAddModalOpen(true)}
 
