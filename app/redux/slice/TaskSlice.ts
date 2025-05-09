@@ -2,7 +2,8 @@ import { Task } from '@/app/types/tasks';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 
-
+// Define API URL based on environment
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'; 
 
 type TaskState = {
   tasks: Task[];
@@ -17,38 +18,36 @@ const initialState: TaskState = {
   currentTask: null,
   status: 'idle',
   error: null,
-  operation: null
+  operation: null,
 };
 
-
 export const addTask = createAsyncThunk<Task, Partial<Task>, { rejectValue: { message: string } }>(
-    'tasks/addTask',
-    async (taskData, { rejectWithValue }) => {
-      try {
-        const response = await axios.post('http://localhost:4000/api/tasks/createTask', taskData,{
-            withCredentials:true
-        },);
-        
-        if (!response.data.task || !response.data.task._id) {
-          return rejectWithValue({ message: 'Invalid task object returned from backend' });
-        }
-  
-        return response.data.task;
-      } catch (err) {
-        const error = err as AxiosError<{ message: string }>;
-        return rejectWithValue(error.response?.data ?? { message: 'Failed to add task' });
+  'tasks/addTask',
+  async (taskData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_BASE}/tasks/createTask`, taskData, {
+        withCredentials: true
+      });
+
+      if (!response.data.task || !response.data.task._id) {
+        return rejectWithValue({ message: 'Invalid task object returned from backend' });
       }
+
+      return response.data.task;
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      return rejectWithValue(error.response?.data ?? { message: 'Failed to add task' });
     }
-  );
-  
+  }
+);
 
 export const fetchTasks = createAsyncThunk<Task[], void, { rejectValue: { message: string } }>(
   'tasks/fetchTasks',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('http://localhost:4000/api/tasks/getTasks',{
-        withCredentials:true
-    });
+      const response = await axios.get(`${API_BASE}/tasks/getTasks`, {
+        withCredentials: true
+      });
       return response.data.tasks;
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -61,13 +60,13 @@ export const fetchTask = createAsyncThunk<Task, string, { rejectValue: { message
   'tasks/fetchTask',
   async (taskId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`http://localhost:4000/api/tasks/getTask/${taskId}`,{
-        withCredentials:true
-    });
+      const response = await axios.get(`${API_BASE}/tasks/getTask/${taskId}`, {
+        withCredentials: true
+      });
       return response.data.task;
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
-      return rejectWithValue(error.response?.data ?? { message: 'Failed to fetch task' },);
+      return rejectWithValue(error.response?.data ?? { message: 'Failed to fetch task' });
     }
   }
 );
@@ -79,14 +78,11 @@ export const updateTask = createAsyncThunk<
 >(
   'tasks/updateTask',
   async ({ taskId, taskData }, { rejectWithValue }) => {
-    
     try {
-      const response = await axios.put(`http://localhost:4000/api/tasks/updateTask/${taskId}`, taskData,{
-        withCredentials:true
-    });
-    console.log('Updated Task Response:', response);
+      const response = await axios.put(`${API_BASE}/tasks/updateTask/${taskId}`, taskData, {
+        withCredentials: true
+      });
       return response.data.task;
-
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
       return rejectWithValue(error.response?.data ?? { message: 'Failed to update task' });
@@ -98,9 +94,9 @@ export const deleteTask = createAsyncThunk<string, string, { rejectValue: { mess
   'tasks/deleteTask',
   async (taskId, { rejectWithValue }) => {
     try {
-      await axios.delete(`http://localhost:4000/api/tasks/deleteTask/${taskId}`,{
-        withCredentials:true
-    });
+      await axios.delete(`${API_BASE}/tasks/deleteTask/${taskId}`, {
+        withCredentials: true
+      });
       return taskId;
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -108,6 +104,7 @@ export const deleteTask = createAsyncThunk<string, string, { rejectValue: { mess
     }
   }
 );
+
 export const completeTask = createAsyncThunk<
   Task,
   { taskId: string; taskData: Partial<Task> },
@@ -117,19 +114,17 @@ export const completeTask = createAsyncThunk<
   async ({ taskId, taskData }, { rejectWithValue }) => {
     try {
       let response;
-
       if (taskData.completed === true && Object.keys(taskData).length === 1) {
         // Special case: only updating completed flag -> call /complete endpoint
-        response = await axios.put(`http://localhost:4000/api/tasks/complete/${taskId}`,taskData,{
-          withCredentials:true
+        response = await axios.put(`${API_BASE}/tasks/complete/${taskId}`, taskData, {
+          withCredentials: true
         });
       } else {
         // General update
-        response = await axios.put(`http://localhost:4000/api/tasks/updateTask/${taskId}`, taskData,{
-          withCredentials:true
+        response = await axios.put(`${API_BASE}/tasks/updateTask/${taskId}`, taskData, {
+          withCredentials: true
         });
       }
-
       return response.data.task;
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -138,9 +133,7 @@ export const completeTask = createAsyncThunk<
   }
 );
 
-
 // Slice
-
 const taskSlice = createSlice({
   name: 'tasks',
   initialState,
@@ -206,7 +199,7 @@ const taskSlice = createSlice({
       })
       .addCase(updateTask.fulfilled, (state, action) => {
         if (!action.payload) return;
-      
+
         state.status = 'succeeded';
         state.operation = null;
         state.tasks = state.tasks.map(task =>
@@ -214,7 +207,6 @@ const taskSlice = createSlice({
         );
         state.currentTask = action.payload;
       })
-      
       .addCase(updateTask.rejected, (state, action) => {
         state.status = 'failed';
         state.operation = null;
@@ -242,7 +234,7 @@ const taskSlice = createSlice({
         if (index !== -1) {
           state.tasks[index] = action.payload;
         }
-      })
+      });
   }
 });
 
