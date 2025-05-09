@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, Plus, Menu, X } from "lucide-react";
+import { ChevronDown,  Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/logo.png"
