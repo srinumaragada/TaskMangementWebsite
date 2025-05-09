@@ -18,7 +18,6 @@ interface TaskBoardProps {
 }
 
 export default function TaskBoard({ 
-  userId,
   projectId,
   tasksByStatus,
   members,  // Destructure members prop
