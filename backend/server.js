@@ -84,7 +84,7 @@ mongoose.connect(process.env.CONN_STR)
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: ["http://localhost:3000","https://task-mangement-website.vercel.app/"],
+  origin: ["http://localhost:3000","https://task-mangement-website.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization", "Cache-Control", "Expires", "Pragma"],
   credentials: true
