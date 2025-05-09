@@ -31,6 +31,7 @@ export default function ProjectDetailPage() {
     (state: RootState) => state.projects
   );
 
+
   useEffect(() => {
     if (projectId) {
       dispatch(clearTasks()); // Clear previous tasks
@@ -98,6 +99,12 @@ export default function ProjectDetailPage() {
   // We'll handle the task error inside the modal
   // If project is not found, display an error message
   if (!project) return <div className="p-6 text-red-500">Project not found</div>;
+  if (project.members) {
+    project.members.forEach(member => {
+      console.log('Member email:', member?.email);  // This will log each member's email
+    });
+  }
+
 
   return (
     <div className="p-6">
