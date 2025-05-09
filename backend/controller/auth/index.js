@@ -4,94 +4,134 @@ const User = require("../../model/users");
 
 
 
-const registerUser=async(req,res)=>{
-    const {userName,email,password} = req.body;
+const registerUser = async (req, res) => {
+    const { userName, email, password } = req.body;
+
+    // Basic validation
+    if (!userName || !email || !password) {
+        return res.status(400).json({
+            success: false,
+            message: "All fields are required"
+        });
+    }
+
     try {
-        const checkUser =await  User.findOne({email});
+        // Check for existing user by email only (since username is no longer unique)
+        const existingUser = await User.findOne({ email });
 
-        if (checkUser)
-            return res.json({
-              success: false,
-              message: "User Already exists with the same email! Please try again",
+        if (existingUser) {
+            return res.status(409).json({ // 409 Conflict
+                success: false,
+                message: "Email already in use. Please use a different email."
             });
+        }
 
-        const hashPassword = await bcrypt.hash(password,12);
-        const newUser = User({
+        // Create new user
+        const hashPassword = await bcrypt.hash(password, 12);
+        const newUser = new User({
             userName,
             email,
             password: hashPassword,
-        })
-        await newUser.save();
-        res.status(200).json({
-          success: true,
-          message: "Registration successful",
         });
+
+        await newUser.save();
+        
+        return res.status(201).json({
+            success: true,
+            message: "Registration successful",
+            user: {
+                id: newUser._id,
+                userName: newUser.userName,
+                email: newUser.email
+            }
+        });
+
     } catch (error) {
-        console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Some error occured",
-    });
+        console.error('Registration error:', error);
+        
+        // Handle specific error cases
+        let errorMessage = "Registration failed";
+        let statusCode = 500;
+
+        if (error.name === 'ValidationError') {
+            // Handle mongoose validation errors
+            errorMessage = Object.values(error.errors).map(err => err.message).join(', ');
+            statusCode = 400;
+        }
+
+        return res.status(statusCode).json({
+            success: false,
+            message: errorMessage
+        });
     }
-}
+};
 
 const loginUser = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
   
-    try {
-      const checkUser = await User.findOne({ email });
-      if (!checkUser)
-        return res.json({
-          success: false,
-          message: "User doesn't exists! Please register first",
-        });
-  
-      const checkPasswordMatch = await bcrypt.compare(
-        password,
-        checkUser.password
-      );
-      if (!checkPasswordMatch)
-        return res.json({
-          success: false,
-          message: "Incorrect password! Please try again",
-        });
-  
-      const token = jwt.sign(
-        {
-          id: checkUser._id,
-          role: checkUser.role,
-          email: checkUser.email,
-          userName: checkUser.userName,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || "60m"  }
-      );
-  
-      res.cookie("token", token, { 
-        httpOnly: true, 
-         secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax"||"none", 
-        maxAge: 24 * 60 * 60 * 1000,
-      }).json({
-        success: true,
-        message: "Logged in successfully",
-        user: {
-          email: checkUser.email,
-          role: checkUser.role,
-          id: checkUser._id,
-          userName: checkUser.userName,
-        },
-      });
-      
-    } catch (e) {
-      console.log(e);
-      res.status(500).json({
+  try {
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({
         success: false,
-        message: "Some error occured",
+        message: "Email and password are required",
       });
     }
-  };
 
+    const checkUser = await User.findOne({ email });
+    if (!checkUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials", // Generic message for security
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, checkUser.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Generate token
+    const token = jwt.sign(
+      {
+        id: checkUser._id,
+        email: checkUser.email,
+        userName: checkUser.userName,
+        role: checkUser.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || "60m" }
+    );
+
+    // Set cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return res.json({
+      success: true,
+      user: {
+        id: checkUser._id,
+        email: checkUser.email,
+        userName: checkUser.userName,
+        role: checkUser.role,
+      },
+    });
+    
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 const logoutUser = (req, res) => {
     res.clearCookie("token").json({
       success: true,
