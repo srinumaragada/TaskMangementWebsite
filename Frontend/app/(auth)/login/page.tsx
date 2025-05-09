@@ -25,24 +25,40 @@ export default function LoginPage() {
     }));
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsLoading(true);
-    setErrors([]);
+ // Update your handleSubmit function
+async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+  setIsLoading(true);
+  setErrors([]);
 
-    try {
-      const result = await dispatch(loginUser({
-        email: formData.email,
-        password: formData.password
-      })).unwrap();
-      router.push('/Pages/dashboard');
-    } catch (error: any) {
-      console.error('Login error:', error);
-      setErrors([error.message || 'Login failed. Please check your credentials.']);
-    } finally {
-      setIsLoading(false);
-    }
+  // Client-side validation
+  if (!formData.email || !formData.password) {
+    setErrors(['Email and password are required']);
+    setIsLoading(false);
+    return;
   }
+
+  try {
+    const result = await dispatch(loginUser({
+      email: formData.email,
+      password: formData.password
+    })).unwrap();
+
+    if (result?.success) {
+      router.push('/Pages/dashboard');
+    } else {
+      setErrors([result?.message || 'Login failed']);
+    }
+  } catch (error: unknown) {
+    let errorMessage = 'Login failed';
+    if (typeof error === 'object' && error !== null && 'message' in error) {
+      errorMessage = (error as { message: string }).message;
+    }
+    setErrors([errorMessage]);
+  } finally {
+    setIsLoading(false);
+  }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -105,7 +121,7 @@ export default function LoginPage() {
           
           <div className="flex items-center justify-end">
             <div className="text-sm">
-              <Link href="/forgot-password" className="font-medium text-orange-500 hover:text-orange-600">
+              <Link href="#" className="font-medium text-orange-500 hover:text-orange-600">
                 Forgot password?
               </Link>
             </div>

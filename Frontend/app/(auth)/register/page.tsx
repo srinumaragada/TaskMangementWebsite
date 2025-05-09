@@ -5,19 +5,24 @@ import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 import { FormEvent, useState } from 'react';
 import { registerUser } from '../../redux/slice/UserSlice';
-
 import { useRouter } from 'next/navigation';
 import { AppDispatch } from '@/app/redux/store/store';
 
+interface RegisterFormData {
+  userName: string;
+  email: string;
+  password: string;
+}
+
 export default function RegisterPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterFormData>({
     userName: '',
     email: '',
     password: '',
   });
   const [errors, setErrors] = useState<string[]>([]);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -29,31 +34,54 @@ export default function RegisterPage() {
     }));
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsLoading(true);
-    setErrors([]);
-    setIsSuccess(false);
+async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+  setIsLoading(true);
+  setErrors([]);
+  setIsSuccess(false);
 
-    try {
-      const result = await dispatch(registerUser(formData)).unwrap();
-      console.log('Registration result:', result);
-      
-   
+  // Basic client-side validation
+  if (!formData.userName || !formData.email || !formData.password) {
+    setErrors(['All fields are required']);
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    const result = await dispatch(registerUser(formData)).unwrap();
+    
+    if (result.success) {
       setIsSuccess(true);
-      
-   
       setTimeout(() => {
         router.push('/login');
       }, 2000);
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      setErrors([error.message || 'Registration failed']);
-    } finally {
-      setIsLoading(false);
     }
+  } catch (error: unknown) {
+    let errorMessage = 'Registration failed';
+    
+    if (typeof error === 'object' && error !== null) {
+      // Handle API error response
+      if ('message' in error) {
+        errorMessage = (error as { message: string }).message;
+      }
+      // Handle HTTP status codes
+      if ('status' in error) {
+        if (error.status === 409) {
+          errorMessage = 'Email already in use';
+        } else if (error.status === 400) {
+          errorMessage = 'Invalid registration data';
+        }
+      }
+    }
+    
+    setErrors([errorMessage]);
+    setInterval(()=>{
+      window.location.href = "";
+    },1000)
+  } finally {
+    setIsLoading(false);
   }
-
+}
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-sm">
