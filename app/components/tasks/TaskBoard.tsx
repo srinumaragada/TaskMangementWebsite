@@ -1,8 +1,8 @@
-// components/tasks/TaskBoard.tsx
 "use client";
 
 import { Task } from '@/app/types/project';
 import TaskCard from './TaskCard';
+import { Member } from '@/app/types/project';  // Import Member type
 
 interface TaskBoardProps {
   userId: string;
@@ -12,6 +12,7 @@ interface TaskBoardProps {
     'in-progress': Task[];
     completed: Task[];
   };
+  members: Member[];  // Add members prop
   onEditTask?: (task: Task) => void;
   onDeleteTask?: (taskId: string) => void;
 }
@@ -19,8 +20,9 @@ interface TaskBoardProps {
 export default function TaskBoard({ 
   userId,
   projectId,
-  tasksByStatus, 
-  onEditTask, 
+  tasksByStatus,
+  members,  // Destructure members prop
+  onEditTask,
   onDeleteTask 
 }: TaskBoardProps) {
   
@@ -29,13 +31,18 @@ export default function TaskBoard({
   const inProgressTasks = Array.isArray(tasksByStatus?.['in-progress']) ? tasksByStatus['in-progress'] : [];
   const completedTasks = Array.isArray(tasksByStatus?.completed) ? tasksByStatus.completed : [];
 
-
-
   const statusColumns = [
     { id: 'todo', title: 'To Do', tasks: todoTasks },
     { id: 'in-progress', title: 'In Progress', tasks: inProgressTasks },
     { id: 'completed', title: 'Completed', tasks: completedTasks },
   ];
+
+  // Function to get the member's email based on assignedTo
+  const getMemberEmailById = (assignedTo: string | undefined) => {
+    if (!assignedTo) return null;
+    const member = members.find(member => member._id === assignedTo);
+    return member ? member.email : 'Unassigned';  // Return 'Unassigned' if no member matches
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -46,15 +53,20 @@ export default function TaskBoard({
           </h2>
           
           {column.tasks.length > 0 ? (
-            column.tasks.map((task) => (
-              <TaskCard
-              projectId={projectId}
-                key={task?._id || Math.random().toString(36).substring(2, 9)}
-                task={task}
-                onEdit={onEditTask}
-                onDelete={onDeleteTask}
-              />
-            ))
+            column.tasks.map((task) => {
+              const assignedMemberEmail = getMemberEmailById(task.assignedTo);
+
+              return (
+                <TaskCard
+                  key={task._id}
+                  projectId={projectId}
+                  task={task}
+                  onEdit={onEditTask}
+                  onDelete={onDeleteTask}
+                  members={members} 
+                />
+              );
+            })
           ) : (
             <p className="text-gray-500 text-center py-4">No tasks in this category</p>
           )}
