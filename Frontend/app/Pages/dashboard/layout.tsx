@@ -21,9 +21,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [activeTab, setActiveTab] = useState("");
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
 
-  const { user: authUser, displayName, isLoading: authLoading } = useAuth();
+  const { user: authUser, displayName } = useAuth();
   const reduxAuthState = useSelector((state: RootState) => state.Auth);
   const dispatch = useDispatch();
   const router = useRouter();
@@ -33,14 +32,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
 
-  // Check authentication status
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login");
-    } else if (!authLoading && user) {
-      setAuthChecked(true);
-    }
-  }, [user, authLoading, router]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -95,10 +86,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return "";
   };
 
-  // Don't render anything until auth is checked
-  if (!authChecked || authLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
+ 
 
   return (
     <TaskProvider>
