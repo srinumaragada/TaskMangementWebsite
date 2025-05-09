@@ -1,25 +1,43 @@
-'use client';
-
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store/store';
+// components/TaskForm.tsx
+import { useState, useEffect } from 'react';
 
 interface TaskFormProps {
-  projectId: string;
   onSubmit: (taskData: any) => Promise<void>;
-  initialData?: any;
+  initialTask?: any; // Changed from initialData to initialTask for clarity
+  onClose?: () => void; // Added optional close handler
 }
 
-export default function TaskForm({ projectId, onSubmit, initialData }: TaskFormProps) {
-  const { members } = useSelector((state: RootState) => state.members);
+export default function TaskForm({ onSubmit, initialTask, onClose }: TaskFormProps) {
+  // Map your task data structure to form fields
   const [taskData, setTaskData] = useState({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    assignedTo: initialData?.assignedTo || (members.length > 0 ? members[0]._id : ''),
-    deadline: initialData?.deadline || new Date().toISOString().split('T')[0],
-    status: initialData?.status || 'not-started',
+    title: '',
+    description: '',
+    dueDate: new Date().toISOString().split('T')[0], // Changed from deadline to dueDate
+    priority: 'medium', // Added priority field
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  // Update form state when initialTask changes
+  useEffect(() => {
+    if (initialTask) {
+      setTaskData({
+        title: initialTask.title || '',
+        description: initialTask.description || '',
+        dueDate: initialTask.dueDate 
+          ? new Date(initialTask.dueDate).toISOString().split('T')[0] 
+          : new Date().toISOString().split('T')[0],
+        priority: initialTask.priority || 'medium',
+      });
+    } else {
+      // Reset form when creating new task
+      setTaskData({
+        title: '',
+        description: '',
+        dueDate: new Date().toISOString().split('T')[0],
+        priority: 'medium',
+      });
+    }
+  }, [initialTask]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,84 +45,83 @@ export default function TaskForm({ projectId, onSubmit, initialData }: TaskFormP
     try {
       await onSubmit({
         ...taskData,
-        project: projectId
+        // Convert date string back to ISO format if needed
+        dueDate: new Date(taskData.dueDate).toISOString()
       });
+      if (onClose) onClose();
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Title</label>
-        <input
-          type="text"
-          value={taskData.title}
-          onChange={(e) => setTaskData({...taskData, title: e.target.value})}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Description</label>
-        <textarea
-          value={taskData.description}
-          onChange={(e) => setTaskData({...taskData, description: e.target.value})}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          rows={3}
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Assigned To</label>
-        <select
-          value={taskData.assignedTo}
-          onChange={(e) => setTaskData({...taskData, assignedTo: e.target.value})}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          required
-        >
-          {members.map((member) => (
-            <option key={member._id} value={member._id}>
-              {member.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Deadline</label>
-        <input
-          type="date"
-          value={taskData.deadline}
-          onChange={(e) => setTaskData({...taskData, deadline: e.target.value})}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Status</label>
-        <select
-          value={taskData.status}
-          onChange={(e) => setTaskData({...taskData, status: e.target.value})}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          required
-        >
-          <option value="not-started">Not Started</option>
-          <option value="in-progress">In Progress</option>
-          <option value="completed">Completed</option>
-        </select>
-      </div>
-      
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
-      >
-        {isLoading ? 'Saving...' : 'Save Task'}
-      </button>
-    </form>
+    <div className="bg-white p-6 rounded-lg shadow-lg">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Title*</label>
+          <input
+            type="text"
+            value={taskData.title}
+            onChange={(e) => setTaskData({...taskData, title: e.target.value})}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            required
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            value={taskData.description}
+            onChange={(e) => setTaskData({...taskData, description: e.target.value})}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            rows={3}
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Due Date*</label>
+          <input
+            type="date"
+            value={taskData.dueDate}
+            onChange={(e) => setTaskData({...taskData, dueDate: e.target.value})}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            required
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Priority*</label>
+          <select
+            value={taskData.priority}
+            onChange={(e) => setTaskData({...taskData, priority: e.target.value})}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            required
+          >
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        
+        <div className="flex justify-end space-x-3">
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+          >
+            {isLoading ? 'Saving...' : 'Save Task'}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
