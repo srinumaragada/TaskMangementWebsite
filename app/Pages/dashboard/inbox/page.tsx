@@ -113,7 +113,7 @@ const Inbox = () => {
         <button
           onClick={() => {
             setEditingTaskId(null)
-            setShowTaskForm(true)
+            setShowTaskForm(prev=>!prev)
           }}
           className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
         >
@@ -144,8 +144,9 @@ const Inbox = () => {
         />
       </div>
 
-      {/* Task Form Modal */}
-      {showTaskForm && (
+    
+{showTaskForm && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <TaskForm 
       onClose={() => {
         setShowTaskForm(false);
@@ -154,7 +155,8 @@ const Inbox = () => {
       initialTask={editingTaskId ? tasks.find(t => t._id === editingTaskId) : undefined}
       onSubmit={editingTaskId ? handleUpdateTask : handleCreateTask}
     />
-  )}
+  </div>
+)}
 
       {/* Tasks List */}
       {filteredTasks.length === 0 ? (
