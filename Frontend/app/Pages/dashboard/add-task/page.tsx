@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, X, Calendar as CalendarIcon, Flag, Tag, Paperclip, Clock } from "lucide-react";
+import {  X, Calendar as CalendarIcon, Flag, Tag, Paperclip, Clock } from "lucide-react";
 import { labels, priorities } from "@/app/utils/page";
 import { useTasks } from "@/app/context/TaskContext";
 
 export default function AddTaskPage() {
-  const { addTask, loading } = useTasks();
+  const { addTask } = useTasks();
   const router = useRouter();
   const [task, setTask] = useState({
     title: "",
