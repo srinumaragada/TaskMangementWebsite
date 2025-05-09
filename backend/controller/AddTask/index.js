@@ -19,7 +19,6 @@ const createTask = async (req, res) => {
       userId // Add the creator as the userId (or assignee)
     });
 
-    // Notify relevant users. If you don’t have an assignee, notify the creator or a set of users.
     const usersToNotify = [userId];  // Notify the task creator as an example
 
     // Send notification to users
@@ -200,6 +199,21 @@ const completeTask = async (req, res) => {
   }
 };
 
+const deleteCompleteTask = async (req, res) => {
+  try {
+    const userId = req.user.id; // or however you identify user
+    const result = await Task.deleteMany({ userId, completed: true });
+
+    res.json({
+      message: "Completed tasks deleted",
+      count: result.deletedCount,
+    });
+  } catch (error) {
+    console.error("Delete Error:", error);
+    res.status(500).json({ message: "Failed to delete completed tasks" });
+  }
+};
+
 module.exports={
-    createTask,getTasks,getTask,updateTask,deleteTask,completeTask
+    createTask,getTasks,getTask,updateTask,deleteTask,completeTask,deleteCompleteTask
 }
