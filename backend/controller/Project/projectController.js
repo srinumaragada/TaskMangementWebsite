@@ -14,66 +14,50 @@ const checkProjectOwnership = async (projectId, userId) => {
   return project;
 };
 
-exports.createProject = async (req, res, next) => {
-  const session = await mongoose.startSession();
-  
+exports.createProject = async (req, res, next) => {  
   try {
-    session.startTransaction();
-    
-    const { title, description } = req.body;
-    const userId = req.user.id;
+  const { title, description } = req.body;
+  const userId = req.user.id;
 
-    // Validate input
-    if (!title || !description) {
-      await session.abortTransaction();
-      return res.status(400).json({
-        success: false,
-        message: 'Title and description are required'
-      });
-    }
-
-    // Create the project
-    const project = new Project({
-      title, 
-      description,
-      createdBy: userId
+  if (!title || !description) {
+    return res.status(400).json({
+      success: false,
+      message: 'Title and description are required'
     });
-
-    // Save with session
-    await project.save({ session });
-
-    // Commit transaction FIRST
-    await session.commitTransaction();
-
-   
-    try {
-      await NotificationService.createAndBroadcastToProject(
-        project._id,
-        'PROJECT_CREATED',
-        {
-          projectId: project._id,
-          projectTitle: project.title,
-          userName: req.user.userName,
-          userId: req.user.id
-        },
-        req.user.id
-      );
-    } catch (notifyErr) {
-      console.error("Notification failed after project creation:", notifyErr);
-      // Continue response even if notification fails
-    }
-
-    res.status(201).json({
-      success: true,
-      project
-    });
-  } catch (error) {
-    await session.abortTransaction();
-    console.error("Error in createProject:", error);
-    next(error);
-  } finally {
-    session.endSession();
   }
+
+  const project = new Project({
+    title, 
+    description,
+    createdBy: userId
+  });
+
+  await project.save();
+
+  try {
+    await NotificationService.createAndBroadcastToProject(
+      project._id,
+      'PROJECT_CREATED',
+      {
+        projectId: project._id,
+        projectTitle: project.title,
+        userName: req.user.userName,
+        userId: req.user.id
+      },
+      req.user.id
+    );
+  } catch (notifyErr) {
+    console.error("Notification failed after project creation:", notifyErr);
+  }
+
+  res.status(201).json({
+    success: true,
+    project
+  });
+} catch (error) {
+  next(error);
+}
+
 };
 
 exports.getProjects = async (req, res, next) => {

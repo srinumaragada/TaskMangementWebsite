@@ -1,12 +1,14 @@
-import type { NextConfig } from "next";
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
-const nextConfig: NextConfig = {
-   eslint: {
-    ignoreDuringBuilds: true, // ← This bypasses ESLint errors
+const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true, // ← Optional: Ignore TypeScript errors too
-  }
+    ignoreBuildErrors: true,
+  },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})(nextConfig);

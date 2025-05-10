@@ -1,11 +1,17 @@
 'use client';
-import GoogleButton from '@/app/components/GoogleButton';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { loginUser } from '../../redux/slice/UserSlice';
 import { useRouter } from 'next/navigation';
 import { AppDispatch } from '@/app/redux/store/store';
+
+
+const GoogleButton = dynamic(() => import('@/app/components/GoogleButton'), {
+  loading: () => <p>Loading Google button...</p>,
+  ssr: false,
+});
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -25,40 +31,40 @@ export default function LoginPage() {
     }));
   }
 
- // Update your handleSubmit function
-async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-  setIsLoading(true);
-  setErrors([]);
+  // Update your handleSubmit function
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsLoading(true);
+    setErrors([]);
 
-  // Client-side validation
-  if (!formData.email || !formData.password) {
-    setErrors(['Email and password are required']);
-    setIsLoading(false);
-    return;
-  }
-
-  try {
-    const result = await dispatch(loginUser({
-      email: formData.email,
-      password: formData.password
-    })).unwrap();
-
-    if (result?.success) {
-      router.push('/Pages/dashboard');
-    } else {
-      setErrors([result?.message || 'Login failed']);
+    // Client-side validation
+    if (!formData.email || !formData.password) {
+      setErrors(['Email and password are required']);
+      setIsLoading(false);
+      return;
     }
-  } catch (error: unknown) {
-    let errorMessage = 'Login failed';
-    if (typeof error === 'object' && error !== null && 'message' in error) {
-      errorMessage = (error as { message: string }).message;
+
+    try {
+      const result = await dispatch(loginUser({
+        email: formData.email,
+        password: formData.password,
+      })).unwrap();
+
+      if (result?.success) {
+        router.push('/Pages/dashboard');
+      } else {
+        setErrors([result?.message || 'Login failed']);
+      }
+    } catch (error: unknown) {
+      let errorMessage = 'Login failed';
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        errorMessage = (error as { message: string }).message;
+      }
+      setErrors([errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
-    setErrors([errorMessage]);
-  } finally {
-    setIsLoading(false);
   }
-}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -129,11 +135,10 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
           
           <div>
             <button
+            aria-label="Continue with Google"
               type="submit"
               disabled={isLoading}
-              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 ${
-                isLoading ? 'opacity-75 cursor-not-allowed' : ''
-              }`}
+              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
             >
               {isLoading ? (
                 <>

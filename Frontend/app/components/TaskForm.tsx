@@ -60,6 +60,7 @@ export default function TaskForm({ onSubmit, initialTask, onClose }: TaskFormPro
         <div>
           <label className="block text-sm font-medium text-gray-700">Title*</label>
           <input
+          title="title"
             type="text"
             value={taskData.title}
             onChange={(e) => setTaskData({...taskData, title: e.target.value})}
@@ -71,6 +72,7 @@ export default function TaskForm({ onSubmit, initialTask, onClose }: TaskFormPro
         <div>
           <label className="block text-sm font-medium text-gray-700">Description</label>
           <textarea
+          title='description'
             value={taskData.description}
             onChange={(e) => setTaskData({...taskData, description: e.target.value})}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
@@ -81,6 +83,7 @@ export default function TaskForm({ onSubmit, initialTask, onClose }: TaskFormPro
         <div>
           <label className="block text-sm font-medium text-gray-700">Due Date*</label>
           <input
+          title='date'
             type="date"
             value={taskData.dueDate}
             onChange={(e) => setTaskData({...taskData, dueDate: e.target.value})}
@@ -92,6 +95,7 @@ export default function TaskForm({ onSubmit, initialTask, onClose }: TaskFormPro
         <div>
           <label className="block text-sm font-medium text-gray-700">Priority*</label>
           <select
+          title='priority'
             value={taskData.priority}
             onChange={(e) => setTaskData({...taskData, priority: e.target.value})}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"

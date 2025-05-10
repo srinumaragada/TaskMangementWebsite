@@ -75,9 +75,9 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     }
     
     setErrors([errorMessage]);
-    setInterval(()=>{
-      window.location.href = "";
-    },1000)
+   setTimeout(() => {
+  window.location.reload();
+}, 2000);
   } finally {
     setIsLoading(false);
   }
