@@ -6,12 +6,8 @@ A web-based application for small teams to manage tasks efficiently — create, 
 ## 🚀 Live Demo
 
 🔗 [Live App](https://task-mangement-website.vercel.app/)
-📂 [GitHub Repository](https://github.com/yourusername/task-manager)
 
-## 📸 Screenshots
 
-![Dashboard](./screenshots/dashboard.png)  
-![Task View](./screenshots/task-view.png)
 
 ## 🔑 Features
 
@@ -29,6 +25,13 @@ A web-based application for small teams to manage tasks efficiently — create, 
 - **Deployment:** Vercel / Render / Railway
 - **Auth:** JWT / Sessions
 - **Version Control:** Git + GitHub
+
+- ## 📸 Screenshots
+
+![Dashboard](./screenshots/dashboard.png)  
+![Task View](./screenshots/task-view.png)
+![Home Page](./screenshots/HomePage.png)
+![Search Page](./screenshots/Search.png)
 
 ## 📦 Getting Started
 
