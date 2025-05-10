@@ -28,9 +28,9 @@ A web-based application for small teams to manage tasks efficiently — create, 
 
 - ## 📸 Screenshots
 
-![Dashboard](./screenshots/dashboard.png)  
+![Dashboard](./screenshots/Dashboard.png)  
 ![Task View](./screenshots/task-view.png)
-![Home Page](./screenshots/HomePage.png)
+![Home Page](./screenshots/HomeePage.png)
 ![Search Page](./screenshots/Search.png)
 
 ## 📦 Getting Started
@@ -101,17 +101,11 @@ npm run dev
 ## 👤 Author
 
 **Your Name**
-📧 [your.email@example.com](mailto:your.email@example.com)
-🔗 [LinkedIn](https://linkedin.com/in/yourname)
-🐙 [GitHub](https://github.com/yourusername)
+📧 [Maragada Srinu](mailto:srinumaragada@gmail.com.com)
+🔗 [LinkedIn](https://www.linkedin.com/in/maragada-srinu/)
+🐙 [GitHub](https://github.com/srinumaragada)
 
 ## 📃 License
 
 MIT License
 
-```
-
----
-
-Let me know if you'd like help replacing any of the placeholders or formatting screenshots!
-```
