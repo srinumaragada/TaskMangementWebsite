@@ -60,7 +60,8 @@ Check out the live demo here: [Task Management System Demo](https://task-mangeme
 - Date-fns (Date utilities)
 
 ### Backend
-- NestJS
+- ExpressJS
+- JavaScript
 - TypeScript
 - MongoDB (with Mongoose)
 - JWT Authentication
