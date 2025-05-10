@@ -4,8 +4,6 @@
 
 This is a feature-rich Task Management System designed for small teams, built with Next.js (frontend), NestJS (backend), and MongoDB (database). The application allows users to create, assign, track, and manage tasks efficiently with a clean, responsive interface.
 
-[![Live Demo](https://task-mangement-website.vercel.app/)
-
 ## Features
 
 ### Core Requirements
