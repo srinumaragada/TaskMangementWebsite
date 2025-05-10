@@ -1,15 +1,8 @@
-import { Inter } from "next/font/google";
-import "./globals.css";
-import ClientLayout from "./clientLayout";
-import NotificationListener from "./components/NotificationListener";
-import { ReactNode } from "react";
-
-// Initialize fonts
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap'
-});
+import '@fontsource/inter/400.css'; 
+import './globals.css';
+import ClientLayout from './clientLayout';
+import NotificationListener from './components/NotificationListener';
+import { ReactNode } from 'react';
 
 export const metadata = {
   title: 'TaskSphere - Task Management App',
@@ -22,8 +15,8 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" className={` ${inter.variable}`}>
-      <body className="antialiased">
+    <html lang="en">
+      <body className="font-inter antialiased">
         <ClientLayout>
           <NotificationListener />
           {children}
